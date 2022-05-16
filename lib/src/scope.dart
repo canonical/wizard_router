@@ -126,13 +126,15 @@ class WizardScopeState extends State<WizardScope> {
   /// ```dart
   /// onPressed: Wizard.of(context).done
   /// ```
-  void done({Object? result}) {
+  FutureOr<void> done({Object? result}) async {
     final routes = _getRoutes();
     assert(routes.isNotEmpty, routes.length.toString());
 
-    widget._route.onDone?.call(result);
+    final flow = context.flow<List<WizardRouteSettings>>();
 
-    context.flow<List<WizardRouteSettings>>().complete((state) {
+    await widget._route.onDone?.call(result);
+
+    flow.complete((state) {
       final copy = List<WizardRouteSettings>.of(state);
       final settings = copy.removeLast();
       return copy

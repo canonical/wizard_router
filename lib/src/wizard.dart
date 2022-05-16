@@ -217,10 +217,10 @@ class _WizardState extends State<Wizard> {
             .toList();
       },
       observers: [_WizardFlowObserver(widget.observers)],
-      onComplete: (state) {
+      onComplete: (state) async {
         final result = state.lastOrNull as WizardRouteResult;
         for (final observer in widget.observers) {
-          observer.onDone(result.route, result.result);
+          await observer.onDone(result.route, result.result);
         }
       },
     );

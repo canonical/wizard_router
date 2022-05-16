@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 
 /// An interface for observing the behavior of a [Wizard].
@@ -9,5 +11,5 @@ abstract class WizardObserver {
   void onNext(Route nextRoute, Route? previousRoute);
 
   /// The wizard was done at [route].
-  void onDone(Route route, Object? result);
+  FutureOr<void> onDone(Route route, Object? result);
 }

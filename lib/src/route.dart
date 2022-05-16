@@ -1,10 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 
 /// The signature of [WizardRoute.onNext] and [WizardRoute.onBack] callbacks.
 typedef WizardRouteCallback = String? Function(RouteSettings settings);
 
 /// The signature of [WizardRoute.onDone] callback.
-typedef WizardDoneCallback = void Function(Object? result);
+typedef WizardDoneCallback = FutureOr<void> Function(Object? result);
 
 class WizardRoute {
   const WizardRoute({
