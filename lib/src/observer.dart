@@ -7,4 +7,7 @@ abstract class WizardObserver {
 
   /// The wizard moved from [previousRoute] to [nextRoute].
   void onNext(Route nextRoute, Route? previousRoute);
+
+  /// The wizard was done at [route].
+  void onDone(Route route, Object? result);
 }
