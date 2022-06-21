@@ -595,4 +595,53 @@ void main() {
     expect(find.text(Routes.second), findsNothing);
     expect(find.text(Routes.third), findsOneWidget);
   });
+
+  testWidgets('hasNext returns false for the last route on skip as well',
+      (tester) async {
+    await pumpWizardApp(
+      tester,
+      initialRoute: Routes.first,
+      routes: {
+        Routes.first: WizardRoute(
+          builder: (context) => ElevatedButton(
+            child: Text(Routes.first),
+            onPressed: () {
+              final wiz = Wizard.of(context);
+              if (wiz.hasNext) wiz.next();
+            },
+          ),
+          //skipping the second.
+          onNext: (_) => Routes.third,
+        ),
+        Routes.second: WizardRoute(builder: (_) => const Text(Routes.second)),
+        Routes.third: WizardRoute(
+          builder: (context) => TextButton(
+            child: Text(Routes.third),
+            onPressed: () {
+              final wiz = Wizard.of(context);
+              // Third should never call next() because it's the last route.
+              if (wiz.hasNext) wiz.next();
+            },
+          ),
+        ),
+      },
+    );
+
+    // We are on the first route.
+    await tester.tap(find.byType(ElevatedButton));
+    await tester.pumpAndSettle();
+
+    //Now we should be on the third
+    expect(find.text(Routes.first), findsNothing);
+    expect(find.text(Routes.second), findsNothing);
+    expect(find.text(Routes.third), findsOneWidget);
+
+    // Nothing should happen now:
+    await tester.tap(find.byType(TextButton));
+    await tester.pumpAndSettle();
+
+    expect(find.text(Routes.first), findsNothing);
+    expect(find.text(Routes.second), findsNothing);
+    expect(find.text(Routes.third), findsOneWidget);
+  });
 }
