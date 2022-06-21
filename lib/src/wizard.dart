@@ -200,10 +200,7 @@ class _WizardState extends State<Wizard> {
       child: WizardScope(
         index: index,
         route: widget.routes[settings.name]!,
-        routes: widget.routes.keys
-            .skipWhile((route) =>
-                route != (widget.initialRoute ?? widget.routes.keys.first))
-            .toList(),
+        routes: widget.routes.keys.toList(),
       ),
     );
   }
