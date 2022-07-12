@@ -436,10 +436,14 @@ void main() {
     expect(secondPage, findsOneWidget);
     expect(thirdPage, findsNothing);
 
-    // 2nd -> 1st
+    expect(firstWizardScope.mounted, isFalse);
+
     final secondWizardScope = Wizard.of(tester.element(secondPage));
     expect(secondWizardScope, isNotNull);
+    expect(secondWizardScope.hasPrevious, isFalse);
+    expect(secondWizardScope.hasNext, isTrue);
 
+    // 2nd -> 1st
     await expectLater(secondWizardScope.back, throwsAssertionError);
 
     // 2nd -> 3rd
@@ -450,10 +454,14 @@ void main() {
     expect(secondPage, findsNothing);
     expect(thirdPage, findsOneWidget);
 
-    // 3rd -> 2nd
+    expect(secondWizardScope.mounted, isFalse);
+
     final thirdWizardScope = Wizard.of(tester.element(thirdPage));
     expect(thirdWizardScope, isNotNull);
+    expect(thirdWizardScope.hasPrevious, isFalse);
+    expect(thirdWizardScope.hasNext, isFalse);
 
+    // 3rd -> 2nd
     await expectLater(thirdWizardScope.back, throwsAssertionError);
   });
 
