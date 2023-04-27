@@ -258,15 +258,19 @@ class _WizardState extends State<Wizard> {
                 _createPage(context, index: index, settings: settings))
             .toList();
       },
-      observers: [_WizardFlowObserver(widget.observers), HeroController()],
+      observers: [
+        _WizardFlowObserver(widget.observers, _controller),
+        HeroController()
+      ],
     );
   }
 }
 
 class _WizardFlowObserver extends NavigatorObserver {
-  _WizardFlowObserver(this.observers);
+  _WizardFlowObserver(this.observers, this.controller);
 
   final List<WizardObserver> observers;
+  final WizardController controller;
 
   @override
   void didPush(Route route, Route? previousRoute) {
@@ -274,6 +278,7 @@ class _WizardFlowObserver extends NavigatorObserver {
       if (previousRoute == null) {
         observer.onInit(route);
       } else {
+        controller.currentRoute = previousRoute.settings.name!;
         observer.onNext(route, previousRoute);
       }
     }
@@ -281,8 +286,9 @@ class _WizardFlowObserver extends NavigatorObserver {
 
   @override
   void didPop(Route route, Route? previousRoute) {
+    controller.currentRoute = previousRoute!.settings.name!;
     for (final observer in observers) {
-      observer.onBack(previousRoute!, route);
+      observer.onBack(previousRoute, route);
     }
   }
 }
