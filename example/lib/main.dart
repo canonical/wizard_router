@@ -13,7 +13,7 @@ void main() {
   runApp(
     ChangeNotifierProvider(
       create: (_) => NetworkModel(service),
-      child: WizardApp(),
+      child: const WizardApp(),
     ),
   );
 }
