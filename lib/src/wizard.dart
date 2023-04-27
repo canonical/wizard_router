@@ -189,28 +189,28 @@ class Wizard extends StatefulWidget {
 }
 
 class _WizardState extends State<Wizard> {
-  List<WizardRouteSettings> _routes = [];
+  late FlowController<List<WizardRouteSettings>> _flowController;
 
   @override
   void initState() {
     super.initState();
-    _ensureInitialRoute();
+    _flowController = FlowController([
+      WizardRouteSettings(name: widget.initialRoute ?? widget.routes.keys.first)
+    ]);
   }
 
   @override
   void didUpdateWidget(Wizard oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _routes.removeWhere((r) => !widget.routes.containsKey(r.name));
-    _ensureInitialRoute();
-  }
-
-  void _ensureInitialRoute() {
-    if (_routes.isEmpty) {
-      _routes = <WizardRouteSettings>[
-        WizardRouteSettings(
-            name: widget.initialRoute ?? widget.routes.keys.first),
-      ];
-    }
+    _flowController.update((state) {
+      final newState =
+          state.where((r) => widget.routes.containsKey(r.name)).toList();
+      if (newState.isEmpty) {
+        newState.add(WizardRouteSettings(
+            name: widget.initialRoute ?? widget.routes.keys.first));
+      }
+      return newState;
+    });
   }
 
   Page _createPage(BuildContext context,
@@ -232,9 +232,10 @@ class _WizardState extends State<Wizard> {
   @override
   Widget build(BuildContext context) {
     return FlowBuilder<List<WizardRouteSettings>>(
-      state: _routes,
+      // state: _routes,
+      controller: _flowController,
       onGeneratePages: (state, __) {
-        _routes = state;
+        // _routes = state;
         return state
             .mapIndexed((index, settings) =>
                 _createPage(context, index: index, settings: settings))
