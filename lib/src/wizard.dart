@@ -225,6 +225,7 @@ class _WizardState extends State<Wizard> {
       child: WizardScope(
         index: index,
         userData: widget.userData,
+        route: _controller.routes[settings.name]!,
         controller: _controller,
       ),
     );

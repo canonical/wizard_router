@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/widgets.dart';
 
 import 'controller.dart';
+import 'route.dart';
 import 'settings.dart';
 
 /// The scope of a wizard page.
@@ -14,13 +15,16 @@ class WizardScope extends StatefulWidget {
     required int index,
     Object? userData,
     required WizardController controller,
+    required WizardRoute route,
   })  : _index = index,
         _userData = userData,
+        _route = route,
         _controller = controller;
 
   final int _index;
   final Object? _userData;
   final WizardController _controller;
+  final WizardRoute _route;
 
   @override
   State<WizardScope> createState() => WizardScopeState();
@@ -69,7 +73,5 @@ class WizardScopeState extends State<WizardScope> {
   Object? get wizardData => widget._userData;
 
   @override
-  Widget build(BuildContext context) => Builder(
-      builder:
-          widget._controller.routes[widget._controller.currentRoute]!.builder);
+  Widget build(BuildContext context) => Builder(builder: widget._route.builder);
 }
