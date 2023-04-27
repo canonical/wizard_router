@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:flow_builder/flow_builder.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'controller.dart';
@@ -210,15 +211,26 @@ class _WizardState extends State<Wizard> {
   @override
   void didUpdateWidget(Wizard oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _controller.flowController.update((state) {
-      final newState =
-          state.where((r) => _controller.routes.containsKey(r.name)).toList();
-      if (newState.isEmpty) {
-        newState.add(WizardRouteSettings(
-            name: widget.initialRoute ?? _controller.routes.keys.first));
+    if (widget.controller != oldWidget.controller ||
+        !listEquals(
+            widget.routes?.keys.toList(), oldWidget.routes?.keys.toList()) ||
+        widget.initialRoute != oldWidget.initialRoute) {
+      if (oldWidget.controller == null) {
+        _controller.dispose();
       }
-      return newState;
-    });
+      _controller = widget.controller ??
+          WizardController(
+              routes: widget.routes!, initialRoute: widget.initialRoute);
+      _controller.flowController.update((state) {
+        final newState =
+            state.where((r) => _controller.routes.containsKey(r.name)).toList();
+        if (newState.isEmpty) {
+          newState.add(WizardRouteSettings(
+              name: widget.initialRoute ?? _controller.routes.keys.first));
+        }
+        return newState;
+      });
+    }
   }
 
   Page _createPage(BuildContext context,
