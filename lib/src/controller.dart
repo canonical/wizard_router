@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flow_builder/flow_builder.dart';
+import 'package:flutter/material.dart';
 
 import 'route.dart';
 import 'settings.dart';
@@ -8,11 +9,12 @@ import 'settings.dart';
 /// Allows widgets such as the AppBar to invoke functionality on the Wizard
 /// This is useful for widgets that are defined above the Wizard, such as a mobile
 /// app's AppBar.
-class WizardController {
+class WizardController extends ChangeNotifier {
   WizardController({required this.routes, this.initialRoute})
       : currentRoute = initialRoute ?? routes.keys.first {
     state = [WizardRouteSettings(name: currentRoute)];
     flowController = FlowController(state);
+    flowController.addListener(notifyListeners);
   }
   String? initialRoute;
   String currentRoute;
@@ -28,8 +30,11 @@ class WizardController {
     flowController.update(callback);
   }
 
+  @override
   void dispose() {
+    flowController.removeListener(notifyListeners);
     flowController.dispose();
+    super.dispose();
   }
 
   /// Requests the wizard to show the first page.
