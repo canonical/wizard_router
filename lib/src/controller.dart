@@ -28,6 +28,10 @@ class WizardController {
     flowController.update(callback);
   }
 
+  void dispose() {
+    flowController.dispose();
+  }
+
   /// Requests the wizard to show the first page.
   ///
   /// ```dart

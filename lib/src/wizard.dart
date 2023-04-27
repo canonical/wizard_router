@@ -200,6 +200,14 @@ class _WizardState extends State<Wizard> {
   }
 
   @override
+  void dispose() {
+    if (widget.controller == null) {
+      _controller.dispose();
+    }
+    super.dispose();
+  }
+
+  @override
   void didUpdateWidget(Wizard oldWidget) {
     super.didUpdateWidget(oldWidget);
     _controller.flowController.update((state) {
