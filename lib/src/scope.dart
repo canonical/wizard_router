@@ -39,17 +39,42 @@ class WizardScopeState extends State<WizardScope> {
   /// ```
   Object? get arguments => ModalRoute.of(context)?.settings.arguments;
 
+  /// Requests the wizard to show the first page.
+  ///
+  /// ```dart
+  /// onPressed: Wizard.of(context).home
+  /// ```
   void home() => widget._controller.home();
 
+  /// Requests the wizard to show the previous page. Optionally, `result` can be
+  /// returned to the previous page.
+  ///
+  /// ```dart
+  /// onPressed: Wizard.of(context).back
+  /// ```
   void back<T extends Object?>({T? arguments}) =>
       widget._controller.back(arguments: arguments);
 
+  /// Requests the wizard to show the next page. Optionally, `arguments` can be
+  /// passed to the next page.
+  ///
+  /// ```dart
+  /// onPressed: Wizard.of(context).next
+  /// ```
   Future<T?> next<T extends Object?>({T? arguments}) =>
       widget._controller.next(arguments: arguments);
 
+  /// Requests the wizard to replace the current page with the next one.
+  /// Optionally, `arguments` can be passed to the next page.
+  ///
+  /// ```dart
+  /// onPressed: () => Wizard.of(context).replace(arguments: something),
+  /// ```
   void replace({Object? arguments}) =>
       widget._controller.replace(arguments: arguments);
 
+  /// Requests the wizard to jump to a specific page. Optionally, `arguments`
+  /// can be passed to the page.
   void jump(String route, {Object? arguments}) =>
       widget._controller.jump(route, arguments: arguments);
 

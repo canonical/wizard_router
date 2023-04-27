@@ -36,10 +36,6 @@ class WizardController extends ChangeNotifier {
   }
 
   /// Requests the wizard to show the first page.
-  ///
-  /// ```dart
-  /// onPressed: Wizard.of(context).home
-  /// ```
   void home() {
     final stack = _getRoutes();
     assert(stack.length > 1,
@@ -55,10 +51,6 @@ class WizardController extends ChangeNotifier {
 
   /// Requests the wizard to show the previous page. Optionally, `result` can be
   /// returned to the previous page.
-  ///
-  /// ```dart
-  /// onPressed: Wizard.of(context).back
-  /// ```
   void back<T extends Object?>({T? arguments}) {
     final stack = _getRoutes();
     assert(stack.length > 1,
@@ -86,10 +78,6 @@ class WizardController extends ChangeNotifier {
 
   /// Requests the wizard to show the next page. Optionally, `arguments` can be
   /// passed to the next page.
-  ///
-  /// ```dart
-  /// onPressed: Wizard.of(context).next
-  /// ```
   Future<T?> next<T extends Object?>({T? arguments}) {
     final next = _getNextRoute<T>(arguments, routes[currentRoute]!.onNext);
 
@@ -135,10 +123,6 @@ class WizardController extends ChangeNotifier {
 
   /// Requests the wizard to replace the current page with the next one.
   /// Optionally, `arguments` can be passed to the next page.
-  ///
-  /// ```dart
-  /// onPressed: () => Wizard.of(context).replace(arguments: something),
-  /// ```
   void replace({Object? arguments}) async {
     final next = _getNextRoute(arguments, routes[currentRoute]!.onReplace);
 
