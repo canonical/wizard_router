@@ -560,7 +560,7 @@ void main() {
 
     final secondPage = find.text(Routes.second);
     final secondWizardScope = Wizard.of(tester.element(secondPage));
-    secondWizardScope.back('result');
+    secondWizardScope.back(arguments: 'result');
     expect(await result, equals('result'));
   });
 
