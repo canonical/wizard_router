@@ -12,13 +12,11 @@ import 'settings.dart';
 class WizardController extends ChangeNotifier {
   WizardController({required this.routes, this.initialRoute})
       : currentRoute = initialRoute ?? routes.keys.first {
-    state = [WizardRouteSettings(name: currentRoute)];
-    flowController = FlowController(state);
+    flowController = FlowController([WizardRouteSettings(name: currentRoute)]);
     flowController.addListener(notifyListeners);
   }
   String? initialRoute;
   String currentRoute;
-  late final List<WizardRouteSettings> state;
   final Map<String, WizardRoute> routes;
   late final FlowController<List<WizardRouteSettings>> flowController;
 
