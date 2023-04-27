@@ -112,7 +112,7 @@ class Wizard extends StatefulWidget {
   const Wizard({
     super.key,
     this.initialRoute,
-    required this.routes,
+    this.routes,
     this.observers = const [],
     this.userData,
     this.controller,
@@ -128,7 +128,7 @@ class Wizard extends StatefulWidget {
   ///
   /// The order of `routes` is the order of the wizard pages are shown. The
   /// order can be customized with [WizardRoute.onNext] and [WizardRoute.onBack].
-  final Map<String, WizardRoute> routes;
+  final Map<String, WizardRoute>? routes;
 
   /// Additional custom data associated with this page.
   final Object? userData;
@@ -189,25 +189,28 @@ class Wizard extends StatefulWidget {
 }
 
 class _WizardState extends State<Wizard> {
-  late FlowController<List<WizardRouteSettings>> _flowController;
+  late WizardController _controller;
 
   @override
   void initState() {
     super.initState();
-    _flowController = FlowController([
-      WizardRouteSettings(name: widget.initialRoute ?? widget.routes.keys.first)
-    ]);
+    _controller = widget.controller ??
+        WizardController(
+            routes: widget.routes!, initialRoute: widget.initialRoute);
   }
 
   @override
   void didUpdateWidget(Wizard oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _flowController.update((state) {
+    _controller = widget.controller ??
+        WizardController(
+            routes: widget.routes!, initialRoute: widget.initialRoute);
+    _controller.flowController.update((state) {
       final newState =
-          state.where((r) => widget.routes.containsKey(r.name)).toList();
+          state.where((r) => _controller.routes.containsKey(r.name)).toList();
       if (newState.isEmpty) {
         newState.add(WizardRouteSettings(
-            name: widget.initialRoute ?? widget.routes.keys.first));
+            name: widget.initialRoute ?? _controller.routes.keys.first));
       }
       return newState;
     });
@@ -221,8 +224,8 @@ class _WizardState extends State<Wizard> {
       key: ValueKey(settings.name),
       child: WizardScope(
         index: index,
-        route: widget.routes[settings.name]!,
-        routes: widget.routes.keys.toList(),
+        route: _controller.routes[settings.name]!,
+        routes: _controller.routes.keys.toList(),
         userData: widget.userData,
         controller: widget.controller,
       ),
@@ -233,7 +236,7 @@ class _WizardState extends State<Wizard> {
   Widget build(BuildContext context) {
     return FlowBuilder<List<WizardRouteSettings>>(
       // state: _routes,
-      controller: _flowController,
+      controller: _controller.flowController,
       onGeneratePages: (state, __) {
         // _routes = state;
         return state

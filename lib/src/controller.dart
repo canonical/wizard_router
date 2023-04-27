@@ -1,4 +1,8 @@
+import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/foundation.dart';
+
+import 'route.dart';
+import 'settings.dart';
 
 /// The set of actions that a controller can accept
 enum WizardControllerAction {
@@ -13,6 +17,14 @@ enum WizardControllerAction {
 /// This is useful for widgets that are defined above the Wizard, such as a mobile
 /// app's AppBar.
 class WizardController extends ChangeNotifier {
+  WizardController({required this.routes, this.initialRoute})
+      : state = [WizardRouteSettings(name: initialRoute ?? routes.keys.first)] {
+    flowController = FlowController(state);
+  }
+  String? initialRoute;
+  final List<WizardRouteSettings> state;
+  final Map<String, WizardRoute> routes;
+  late final FlowController<List<WizardRouteSettings>> flowController;
   WizardControllerAction action = WizardControllerAction.unknown;
   Object? arguments;
 
