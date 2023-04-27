@@ -202,9 +202,6 @@ class _WizardState extends State<Wizard> {
   @override
   void didUpdateWidget(Wizard oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _controller = widget.controller ??
-        WizardController(
-            routes: widget.routes!, initialRoute: widget.initialRoute);
     _controller.flowController.update((state) {
       final newState =
           state.where((r) => _controller.routes.containsKey(r.name)).toList();
