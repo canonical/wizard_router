@@ -1,10 +1,8 @@
 import 'dart:async';
 
-import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/widgets.dart';
 
 import 'controller.dart';
-import 'route.dart';
 import 'settings.dart';
 
 /// The scope of a wizard page.
@@ -14,21 +12,15 @@ class WizardScope extends StatefulWidget {
   const WizardScope({
     super.key,
     required int index,
-    required WizardRoute route,
-    required List<String> routes,
     Object? userData,
-    WizardController? controller,
+    required WizardController controller,
   })  : _index = index,
-        _route = route,
-        _routes = routes,
         _userData = userData,
         _controller = controller;
 
   final int _index;
-  final WizardRoute _route;
-  final List<String> _routes;
   final Object? _userData;
-  final WizardController? _controller;
+  final WizardController _controller;
 
   @override
   State<WizardScope> createState() => WizardScopeState();
@@ -43,184 +35,41 @@ class WizardScopeState extends State<WizardScope> {
   /// ```
   Object? get arguments => ModalRoute.of(context)?.settings.arguments;
 
-  /// Requests the wizard to show the first page.
-  ///
-  /// ```dart
-  /// onPressed: Wizard.of(context).home
-  /// ```
-  void home() {
-    final routes = _getRoutes();
-    assert(routes.length > 1,
-        '`Wizard.home()` called from the first route ${routes.last.name}');
+  void home() => widget._controller.home();
 
-    _updateRoutes((state) {
-      final copy = List<WizardRouteSettings>.of(state);
-      return copy..replaceRange(1, routes.length, []);
-    });
-  }
+  void back<T extends Object?>({T? arguments}) =>
+      widget._controller.back(arguments: arguments);
 
-  /// Requests the wizard to show the previous page. Optionally, `result` can be
-  /// returned to the previous page.
-  ///
-  /// ```dart
-  /// onPressed: Wizard.of(context).back
-  /// ```
-  void back<T extends Object?>([T? result]) {
-    final routes = _getRoutes();
-    assert(routes.length > 1,
-        '`Wizard.back()` called from the first route ${routes.last.name}');
+  Future<T?> next<T extends Object?>({T? arguments}) =>
+      widget._controller.next(arguments: arguments);
 
-    // go back to a specific route, or pick the previous route on the list
-    final previous = widget._route.onBack?.call(routes.last);
-    if (previous != null) {
-      assert(widget._routes.contains(previous),
-          '`Wizard.routes` is missing route \'$previous\'.');
-    }
+  void replace({Object? arguments}) =>
+      widget._controller.replace(arguments: arguments);
 
-    final start = previous != null
-        ? routes.lastIndexWhere((settings) => settings.name == previous) + 1
-        : routes.length - 1;
-
-    _updateRoutes((state) {
-      final copy = List<WizardRouteSettings>.of(state);
-      copy[start].completer.complete(result);
-      return copy..replaceRange(start, routes.length, []);
-    });
-  }
-
-  /// Requests the wizard to show the next page. Optionally, `arguments` can be
-  /// passed to the next page.
-  ///
-  /// ```dart
-  /// onPressed: Wizard.of(context).next
-  /// ```
-  Future<T?> next<T extends Object?>({Object? arguments}) {
-    final next = _getNextRoute<T>(arguments, widget._route.onNext);
-
-    _updateRoutes((state) {
-      final copy = List<WizardRouteSettings>.of(state);
-      return copy..add(next);
-    });
-
-    return next.completer.future;
-  }
-
-  WizardRouteSettings<T?> _getNextRoute<T extends Object?>(
-    Object? arguments,
-    WizardRouteCallback? advance,
-  ) {
-    final routes = _getRoutes();
-    assert(routes.isNotEmpty, routes.length.toString());
-
-    final previous = WizardRouteSettings(
-      name: routes.last.name,
-      arguments: arguments,
-    );
-
-    // advance to a specific route
-    String? onNext() => advance?.call(previous);
-
-    // pick the next route on the list
-    String nextRoute() {
-      final index = widget._routes.indexOf(previous.name!);
-      assert(index < widget._routes.length - 1,
-          '`Wizard.next()` called from the last route ${previous.name}.');
-      return widget._routes[index + 1];
-    }
-
-    final name = onNext() ?? nextRoute();
-    assert(widget._routes.contains(name),
-        '`Wizard.routes` is missing route \'$name\'.');
-
-    return WizardRouteSettings<T?>(name: name, arguments: arguments);
-  }
-
-  /// Requests the wizard to replace the current page with the next one.
-  /// Optionally, `arguments` can be passed to the next page.
-  ///
-  /// ```dart
-  /// onPressed: () => Wizard.of(context).replace(arguments: something),
-  /// ```
-  void replace({Object? arguments}) async {
-    final next = _getNextRoute(arguments, widget._route.onReplace);
-
-    _updateRoutes((state) {
-      final copy = List<WizardRouteSettings>.of(state);
-      copy[copy.length - 1] = next;
-      return copy;
-    });
-  }
-
-  /// Requests the wizard to jump to a specific page. Optionally, `arguments`
-  /// can be passed to the page.
-  void jump(String route, {Object? arguments}) async {
-    assert(widget._routes.contains(route),
-        '`Wizard.jump()` called with an unknown route $route.');
-    final settings = WizardRouteSettings(name: route, arguments: arguments);
-
-    _updateRoutes((state) {
-      final copy = List<WizardRouteSettings>.of(state);
-      return copy..add(settings);
-    });
-  }
+  void jump(String route, {Object? arguments}) =>
+      widget._controller.jump(route, arguments: arguments);
 
   List<WizardRouteSettings> _getRoutes() =>
-      context.flow<List<WizardRouteSettings>>().state;
-
-  void _updateRoutes(
-    List<WizardRouteSettings> Function(List<WizardRouteSettings>) callback,
-  ) {
-    context.flow<List<WizardRouteSettings>>().update(callback);
-  }
+      widget._controller.flowController.state;
 
   /// Returns `false` if the wizard page is the first page.
   bool get hasPrevious => widget._index > 0;
 
   /// Returns `false` if the wizard page is the last page.
   bool get hasNext {
-    if (widget._routes.isEmpty) return false;
+    if (widget._controller.routes.isEmpty) return false;
     final previous = _getRoutes().last.name!;
-    final previousIndex = widget._routes.indexOf(previous);
-    return previousIndex < widget._routes.length - 1;
+    final previousIndex =
+        widget._controller.routes.keys.toList().indexOf(previous);
+    return previousIndex < widget._controller.routes.length - 1;
   }
 
-  Object? get routeData => widget._route.userData;
+  Object? get routeData =>
+      widget._controller.routes[widget._controller.currentRoute]!.userData;
   Object? get wizardData => widget._userData;
 
-  /// Invokes appropriate func based on controller's requested action
-  void _controllerListener() {
-    switch (widget._controller?.action) {
-      case WizardControllerAction.home:
-        home();
-        break;
-      case WizardControllerAction.back:
-        back(widget._controller?.arguments);
-        break;
-      case WizardControllerAction.next:
-        next(arguments: widget._controller?.arguments);
-        break;
-      case WizardControllerAction.replace:
-        replace(arguments: widget._controller?.arguments);
-        break;
-      case null:
-      case WizardControllerAction.unknown:
-        debugPrint('Wizard does not know how to handle null or unknown action');
-        break;
-    }
-  }
-
   @override
-  void initState() {
-    super.initState();
-    widget._controller?.addListener(_controllerListener);
-  }
-
-  @override
-  void dispose() {
-    widget._controller?.removeListener(_controllerListener);
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) => Builder(builder: widget._route.builder);
+  Widget build(BuildContext context) => Builder(
+      builder:
+          widget._controller.routes[widget._controller.currentRoute]!.builder);
 }

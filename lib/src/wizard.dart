@@ -224,10 +224,8 @@ class _WizardState extends State<Wizard> {
       key: ValueKey(settings.name),
       child: WizardScope(
         index: index,
-        route: _controller.routes[settings.name]!,
-        routes: _controller.routes.keys.toList(),
         userData: widget.userData,
-        controller: widget.controller,
+        controller: _controller,
       ),
     );
   }
@@ -235,10 +233,8 @@ class _WizardState extends State<Wizard> {
   @override
   Widget build(BuildContext context) {
     return FlowBuilder<List<WizardRouteSettings>>(
-      // state: _routes,
       controller: _controller.flowController,
       onGeneratePages: (state, __) {
-        // _routes = state;
         return state
             .mapIndexed((index, settings) =>
                 _createPage(context, index: index, settings: settings))
