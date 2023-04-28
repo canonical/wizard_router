@@ -2,11 +2,12 @@ import 'package:collection/collection.dart';
 import 'package:flow_builder/flow_builder.dart';
 import 'package:flutter/material.dart';
 
-import 'controller.dart';
 import 'observer.dart';
 import 'route.dart';
 import 'scope.dart';
 import 'settings.dart';
+
+part 'controller.dart';
 
 /// A wizard is a flow of steps that the user can navigate through.
 ///
@@ -221,7 +222,7 @@ class _WizardState extends State<Wizard> {
       _controller = widget.controller ??
           WizardController(
               routes: widget.routes!, initialRoute: widget.initialRoute);
-      _controller.flowController.update((state) {
+      _controller._flowController.update((state) {
         final newState =
             state.where((r) => _controller.routes.containsKey(r.name)).toList();
         if (newState.isEmpty) {
@@ -251,7 +252,7 @@ class _WizardState extends State<Wizard> {
   @override
   Widget build(BuildContext context) {
     return FlowBuilder<List<WizardRouteSettings>>(
-      controller: _controller.flowController,
+      controller: _controller._flowController,
       onGeneratePages: (state, __) {
         return state
             .mapIndexed((index, settings) =>

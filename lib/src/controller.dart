@@ -1,74 +1,66 @@
-import 'dart:async';
-
-import 'package:flow_builder/flow_builder.dart';
-import 'package:flutter/material.dart';
-
-import 'route.dart';
-import 'settings.dart';
+part of 'wizard.dart';
 
 /// Allows widgets such as the AppBar to invoke functionality on the Wizard
 /// This is useful for widgets that are defined above the Wizard, such as a mobile
 /// app's AppBar.
 class WizardController extends ChangeNotifier {
   WizardController({required this.routes, this.initialRoute}) {
-    flowController = FlowController(
+    _flowController = FlowController(
         [WizardRouteSettings(name: initialRoute ?? routes.keys.first)]);
-    flowController.addListener(notifyListeners);
+    _flowController.addListener(notifyListeners);
   }
   final String? initialRoute;
   final Map<String, WizardRoute> routes;
-  late final FlowController<List<WizardRouteSettings>> flowController;
+  late final FlowController<List<WizardRouteSettings>> _flowController;
 
-  List<WizardRouteSettings> _getRoutes() => flowController.state;
-  String get currentRoute => _getRoutes().last.name!;
+  List<WizardRouteSettings> get state => _flowController.state;
+  String get currentRoute => state.last.name!;
 
   void _updateRoutes(
     List<WizardRouteSettings> Function(List<WizardRouteSettings>) callback,
   ) {
-    flowController.update(callback);
+    _flowController.update(callback);
   }
 
   @override
   void dispose() {
-    flowController.removeListener(notifyListeners);
-    flowController.dispose();
+    _flowController.removeListener(notifyListeners);
+    _flowController.dispose();
     super.dispose();
   }
 
   /// Requests the wizard to show the first page.
   void home() {
-    final stack = _getRoutes();
-    assert(stack.length > 1,
-        '`Wizard.home()` called from the first route ${stack.last.name}');
+    assert(state.length > 1,
+        '`Wizard.home()` called from the first route ${state.last.name}');
 
     _updateRoutes((state) {
       final copy = List<WizardRouteSettings>.of(state);
-      return copy..replaceRange(1, stack.length, []);
+      return copy..replaceRange(1, state.length, []);
     });
   }
 
   /// Requests the wizard to show the previous page. Optionally, `result` can be
   /// returned to the previous page.
   void back<T extends Object?>([T? result]) {
-    final stack = _getRoutes();
-    assert(stack.length > 1,
-        '`Wizard.back()` called from the first route ${stack.last.name}');
+    assert(state.length > 1,
+        '`Wizard.back()` called from the first route ${state.last.name}');
 
     // go back to a specific route, or pick the previous route on the list
-    final previous = routes[currentRoute]!.onBack?.call(stack.last);
+    final previous = routes[currentRoute]!.onBack?.call(state.last);
     if (previous != null) {
       assert(routes.keys.contains(previous),
           '`Wizard.routes` is missing route \'$previous\'.');
     }
 
     final start = previous != null
-        ? stack.lastIndexWhere((settings) => settings.name == previous) + 1
-        : stack.length - 1;
+        ? state.lastIndexWhere((settings) => settings.name == previous) + 1
+        : state.length - 1;
 
     _updateRoutes((state) {
       final copy = List<WizardRouteSettings>.of(state);
       copy[start].completer.complete(result);
-      return copy..replaceRange(start, stack.length, []);
+      return copy..replaceRange(start, state.length, []);
     });
   }
 
@@ -89,11 +81,10 @@ class WizardController extends ChangeNotifier {
     T? arguments,
     WizardRouteCallback? advance,
   ) {
-    final stack = _getRoutes();
-    assert(stack.isNotEmpty, stack.length.toString());
+    assert(state.isNotEmpty, state.length.toString());
 
     final previous = WizardRouteSettings(
-      name: stack.last.name,
+      name: state.last.name,
       arguments: arguments,
     );
 
