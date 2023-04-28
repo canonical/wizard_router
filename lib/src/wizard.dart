@@ -1,6 +1,5 @@
 import 'package:collection/collection.dart';
 import 'package:flow_builder/flow_builder.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'controller.dart';
@@ -212,10 +211,10 @@ class _WizardState extends State<Wizard> {
   @override
   void didUpdateWidget(Wizard oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.controller != oldWidget.controller ||
-        !listEquals(
-            widget.routes?.keys.toList(), oldWidget.routes?.keys.toList()) ||
-        widget.initialRoute != oldWidget.initialRoute) {
+    if (widget.initialRoute != oldWidget.initialRoute ||
+        widget.controller != oldWidget.controller ||
+        !const IterableEquality()
+            .equals(widget.routes?.keys, oldWidget.routes?.keys)) {
       if (oldWidget.controller == null) {
         _controller.dispose();
       }
