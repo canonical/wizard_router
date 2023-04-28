@@ -117,7 +117,8 @@ class Wizard extends StatefulWidget {
     this.observers = const [],
     this.userData,
     this.controller,
-  });
+  }) : assert((routes == null) != (controller == null),
+            'Either routes or controller must be specified');
 
   /// The name of the first route to show.
   ///
