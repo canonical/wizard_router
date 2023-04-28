@@ -102,10 +102,11 @@ class WizardController extends ChangeNotifier {
 
     // pick the next route on the list
     String nextRoute() {
-      final index = routes.keys.toList().indexOf(previous.name!);
-      assert(index < routes.length - 1,
+      final routeNames = routes.keys.toList();
+      final index = routeNames.indexOf(previous.name!);
+      assert(index < routeNames.length - 1,
           '`Wizard.next()` called from the last route ${previous.name}.');
-      return routes.keys.toList()[index + 1];
+      return routeNames[index + 1];
     }
 
     final name = onNext() ?? nextRoute();
