@@ -92,8 +92,7 @@ class WizardScopeState extends State<WizardScope> {
     return previousIndex < widget._controller.routes.length - 1;
   }
 
-  Object? get routeData =>
-      widget._controller.routes[widget._controller.currentRoute]!.userData;
+  Object? get routeData => widget._route.userData;
   Object? get wizardData => widget._userData;
 
   @override
