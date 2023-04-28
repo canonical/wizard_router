@@ -10,17 +10,17 @@ import 'settings.dart';
 /// This is useful for widgets that are defined above the Wizard, such as a mobile
 /// app's AppBar.
 class WizardController extends ChangeNotifier {
-  WizardController({required this.routes, this.initialRoute})
-      : currentRoute = initialRoute ?? routes.keys.first {
-    flowController = FlowController([WizardRouteSettings(name: currentRoute)]);
+  WizardController({required this.routes, this.initialRoute}) {
+    flowController = FlowController(
+        [WizardRouteSettings(name: initialRoute ?? routes.keys.first)]);
     flowController.addListener(notifyListeners);
   }
   String? initialRoute;
-  String currentRoute;
   final Map<String, WizardRoute> routes;
   late final FlowController<List<WizardRouteSettings>> flowController;
 
   List<WizardRouteSettings> _getRoutes() => flowController.state;
+  String get currentRoute => _getRoutes().last.name!;
 
   void _updateRoutes(
     List<WizardRouteSettings> Function(List<WizardRouteSettings>) callback,
@@ -43,9 +43,7 @@ class WizardController extends ChangeNotifier {
 
     _updateRoutes((state) {
       final copy = List<WizardRouteSettings>.of(state);
-      final newStack = copy..replaceRange(1, stack.length, []);
-      currentRoute = newStack.last.name!;
-      return newStack;
+      return copy..replaceRange(1, stack.length, []);
     });
   }
 
@@ -70,9 +68,7 @@ class WizardController extends ChangeNotifier {
     _updateRoutes((state) {
       final copy = List<WizardRouteSettings>.of(state);
       copy[start].completer.complete(arguments);
-      final newStack = copy..replaceRange(start, stack.length, []);
-      currentRoute = newStack.last.name!;
-      return newStack;
+      return copy..replaceRange(start, stack.length, []);
     });
   }
 
@@ -83,9 +79,7 @@ class WizardController extends ChangeNotifier {
 
     _updateRoutes((state) {
       final copy = List<WizardRouteSettings>.of(state);
-      final newStack = copy..add(next);
-      currentRoute = newStack.last.name!;
-      return newStack;
+      return copy..add(next);
     });
 
     return next.completer.future;
@@ -129,7 +123,6 @@ class WizardController extends ChangeNotifier {
     _updateRoutes((state) {
       final copy = List<WizardRouteSettings>.of(state);
       copy[copy.length - 1] = next;
-      currentRoute = copy.last.name!;
       return copy;
     });
   }
@@ -143,9 +136,7 @@ class WizardController extends ChangeNotifier {
 
     _updateRoutes((state) {
       final copy = List<WizardRouteSettings>.of(state);
-      final newStack = copy..add(settings);
-      currentRoute = newStack.last.name!;
-      return newStack;
+      return copy..add(settings);
     });
   }
 }
