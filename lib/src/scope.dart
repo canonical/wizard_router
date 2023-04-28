@@ -52,8 +52,7 @@ class WizardScopeState extends State<WizardScope> {
   /// ```dart
   /// onPressed: Wizard.of(context).back
   /// ```
-  void back<T extends Object?>({T? arguments}) =>
-      widget._controller.back(arguments: arguments);
+  void back<T extends Object?>([T? result]) => widget._controller.back(result);
 
   /// Requests the wizard to show the next page. Optionally, `arguments` can be
   /// passed to the next page.

@@ -49,7 +49,7 @@ class WizardController extends ChangeNotifier {
 
   /// Requests the wizard to show the previous page. Optionally, `result` can be
   /// returned to the previous page.
-  void back<T extends Object?>({T? arguments}) {
+  void back<T extends Object?>([T? result]) {
     final stack = _getRoutes();
     assert(stack.length > 1,
         '`Wizard.back()` called from the first route ${stack.last.name}');
@@ -67,7 +67,7 @@ class WizardController extends ChangeNotifier {
 
     _updateRoutes((state) {
       final copy = List<WizardRouteSettings>.of(state);
-      copy[start].completer.complete(arguments);
+      copy[start].completer.complete(result);
       return copy..replaceRange(start, stack.length, []);
     });
   }
