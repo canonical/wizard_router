@@ -15,7 +15,7 @@ class WizardController extends ChangeNotifier {
         [WizardRouteSettings(name: initialRoute ?? routes.keys.first)]);
     flowController.addListener(notifyListeners);
   }
-  String? initialRoute;
+  final String? initialRoute;
   final Map<String, WizardRoute> routes;
   late final FlowController<List<WizardRouteSettings>> flowController;
 
