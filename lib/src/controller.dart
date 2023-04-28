@@ -16,7 +16,7 @@ class WizardController extends ChangeNotifier {
   List<WizardRouteSettings> get state => _flowController.state;
   String get currentRoute => state.last.name!;
 
-  void _updateRoutes(
+  void _updateState(
     List<WizardRouteSettings> Function(List<WizardRouteSettings>) callback,
   ) {
     _flowController.update(callback);
@@ -34,7 +34,7 @@ class WizardController extends ChangeNotifier {
     assert(state.length > 1,
         '`Wizard.home()` called from the first route ${state.last.name}');
 
-    _updateRoutes((state) {
+    _updateState((state) {
       final copy = List<WizardRouteSettings>.of(state);
       return copy..replaceRange(1, state.length, []);
     });
@@ -57,7 +57,7 @@ class WizardController extends ChangeNotifier {
         ? state.lastIndexWhere((settings) => settings.name == previous) + 1
         : state.length - 1;
 
-    _updateRoutes((state) {
+    _updateState((state) {
       final copy = List<WizardRouteSettings>.of(state);
       copy[start].completer.complete(result);
       return copy..replaceRange(start, state.length, []);
@@ -69,7 +69,7 @@ class WizardController extends ChangeNotifier {
   Future<T?> next<T extends Object?>({T? arguments}) {
     final next = _getNextRoute<T>(arguments, routes[currentRoute]!.onNext);
 
-    _updateRoutes((state) {
+    _updateState((state) {
       final copy = List<WizardRouteSettings>.of(state);
       return copy..add(next);
     });
@@ -112,7 +112,7 @@ class WizardController extends ChangeNotifier {
   void replace({Object? arguments}) async {
     final next = _getNextRoute(arguments, routes[currentRoute]!.onReplace);
 
-    _updateRoutes((state) {
+    _updateState((state) {
       final copy = List<WizardRouteSettings>.of(state);
       copy[copy.length - 1] = next;
       return copy;
@@ -126,7 +126,7 @@ class WizardController extends ChangeNotifier {
         '`Wizard.jump()` called with an unknown route $route.');
     final settings = WizardRouteSettings(name: route, arguments: arguments);
 
-    _updateRoutes((state) {
+    _updateState((state) {
       final copy = List<WizardRouteSettings>.of(state);
       return copy..add(settings);
     });
