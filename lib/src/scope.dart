@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/widgets.dart';
 
 import 'route.dart';
-import 'settings.dart';
 import 'wizard.dart';
 
 /// The scope of a wizard page.
@@ -77,8 +76,6 @@ class WizardScopeState extends State<WizardScope> {
   void jump(String route, {Object? arguments}) =>
       widget._controller.jump(route, arguments: arguments);
 
-  List<WizardRouteSettings> _getRoutes() => widget._controller.state;
-
   /// Returns `false` if the wizard page is the first page.
   bool get hasPrevious => widget._index > 0;
 
@@ -86,7 +83,7 @@ class WizardScopeState extends State<WizardScope> {
   bool get hasNext {
     final routes = widget._controller.routes;
     if (routes.isEmpty) return false;
-    final previous = _getRoutes().last.name!;
+    final previous = widget._controller.currentRoute;
     final previousIndex = routes.keys.toList().indexOf(previous);
     return previousIndex < routes.length - 1;
   }
