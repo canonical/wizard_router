@@ -85,11 +85,11 @@ class WizardScopeState extends State<WizardScope> {
 
   /// Returns `false` if the wizard page is the last page.
   bool get hasNext {
-    if (widget._controller.routes.isEmpty) return false;
+    final routes = widget._controller.routes;
+    if (routes.isEmpty) return false;
     final previous = _getRoutes().last.name!;
-    final previousIndex =
-        widget._controller.routes.keys.toList().indexOf(previous);
-    return previousIndex < widget._controller.routes.length - 1;
+    final previousIndex = routes.keys.toList().indexOf(previous);
+    return previousIndex < routes.length - 1;
   }
 
   Object? get routeData => widget._route.userData;
