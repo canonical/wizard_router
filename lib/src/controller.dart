@@ -12,6 +12,7 @@ class WizardController extends ChangeNotifier {
   final String? initialRoute;
   final Map<String, WizardRoute> routes;
   late final FlowController<List<WizardRouteSettings>> _flowController;
+  bool _wasDisposed = false;
 
   int _loading = 0;
   bool get isLoading => _loading > 0;
@@ -27,7 +28,7 @@ class WizardController extends ChangeNotifier {
       }
       return next;
     } finally {
-      if (--_loading == 0) notifyListeners();
+      if (--_loading == 0 && !_wasDisposed) notifyListeners();
     }
   }
 
@@ -37,11 +38,12 @@ class WizardController extends ChangeNotifier {
   void _updateState(
     List<WizardRouteSettings> Function(List<WizardRouteSettings>) callback,
   ) {
-    _flowController.update(callback);
+    if (!_wasDisposed) _flowController.update(callback);
   }
 
   @override
   void dispose() {
+    _wasDisposed = true;
     _flowController.removeListener(notifyListeners);
     _flowController.dispose();
     super.dispose();

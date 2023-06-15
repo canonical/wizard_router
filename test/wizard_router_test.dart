@@ -994,4 +994,31 @@ void main() {
     expect(controller.isLoading, isFalse);
     expect(wasNotified, equals(3)); // route + loading state changes
   });
+
+  testWidgets('dispose while loading', (tester) async {
+    await pumpWizardApp(tester, routes: {
+      Routes.first: WizardRoute(
+        builder: (_) => const Text(Routes.first),
+      ),
+      Routes.second: WizardRoute(
+          builder: (_) => const Text(Routes.second),
+          onLoad: (_) =>
+              Future.delayed(const Duration(seconds: 1)).then((_) => true)),
+    });
+    await tester.pumpAndSettle();
+
+    final firstPage = find.text(Routes.first);
+    final wizard = Wizard.of(tester.element(firstPage));
+    wizard.next();
+
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(wizard.isLoading, isTrue);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    expect(find.byType(Wizard), findsNothing);
+
+    await tester.pump(const Duration(seconds: 1));
+    expect(wizard.isLoading, isFalse);
+    expect(tester.takeException(), isNull);
+  });
 }
