@@ -37,7 +37,7 @@ class WizardController extends SafeChangeNotifier {
   void _updateState(
     List<WizardRouteSettings> Function(List<WizardRouteSettings>) callback,
   ) {
-    _flowController.update(callback);
+    if (!isDisposed) _flowController.update(callback);
   }
 
   @override
