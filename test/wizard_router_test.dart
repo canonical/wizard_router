@@ -490,6 +490,10 @@ void main() {
     expect(firstPage, findsOneWidget);
     expect(secondPage, findsNothing);
     expect(thirdPage, findsNothing);
+
+    // unknown
+    await expectLater(
+        firstWizardScope.jump('/unknown'), throwsA(isA<WizardException>()));
   });
 
   testWidgets('has next or previous', (tester) async {
